@@ -1,0 +1,22 @@
+name: "TODO Sync"
+description: "Scans TODO comments, creates GitHub issues, closes resolved ones, and generates a summary file"
+author: "Keith Solomon"
+inputs:
+  github_token:
+    description: "GitHub token"
+    required: true
+  summary_file:
+    description: "Output path for the markdown summary"
+    default: "TODO_SUMMARY.md"
+    required: false
+  dry_run:
+    description: "Run the action without making any changes (no issues, no commits)"
+    default: "false"
+    required: false
+  commit:
+    description: "Whether to auto-commit the TODO summary and updates"
+    default: "true"
+    required: false
+runs:
+  using: "node20"
+  main: "index.js"
