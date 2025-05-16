@@ -74,9 +74,7 @@ function processData(data) {
 The action will:
 
 - Create or update a GitHub Issue titled "Refactor this function to improve performance".
-- Add an entry to TODO_SUMMARY.md linking to the Issue.
-- YouTube+2GitHub+2DEV Community+2
-- Stack Overflow+5Reddit+5Stack Overflow+5
+- Add an entry to TODO_SUMMARY.md linking to the Issue and commit.
 
 ## 🧪 Dry Run Mode
 
