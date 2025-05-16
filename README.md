@@ -6,7 +6,7 @@ This GitHub Action scans your repository for TODO comments, opens/updates GitHub
 
 ```yaml
 - name: Sync TODOs
-  uses: your-org/todo-sync-action@v1
+  uses: Solo-Web-Works/todo-sync-action@v1
   with:
     github_token: ${{ secrets.GITHUB_TOKEN }}
     summary_file: docs/todos.md
