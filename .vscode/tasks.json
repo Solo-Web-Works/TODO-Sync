@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Run TODO Sync Action (dry run)",
+			"command": "node src/index.js",
+			"args": [],
+			"isBackground": false
+		}
+	]
+}
