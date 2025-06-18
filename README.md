@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Sync TODOs
-        uses: Solo-Web-Works/TODO-Sync@v1
+        uses: Solo-Web-Works/TODO-Sync@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           summary_file: TODO_SUMMARY.md
