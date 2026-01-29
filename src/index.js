@@ -37,11 +37,19 @@ async function run() {
       const raw = fs.readFileSync(file, 'utf8');
       const lines = raw.split('\n');
       lines.forEach((line, index) => {
-        const todoMatch = line.match(/TODO:\s*(.*?)(?:\s+Label:\s*(.+))?$/i);
+        // Match TODOs in normal, Blade, and HTML comments
+        // Examples:
+        //   // TODO: ...
+        //   # TODO: ...
+        //   <!-- TODO: ... -->
+        //   {{-- TODO: ... --}}
+        //   /* TODO: ... */
+        //   TODO: ...
+        const todoMatch = line.match(/(?:<!--|\/\/|#|\/\*|\{\{--)?\s*TODO:\s*(.*?)(?:\s+Label:\s*(.+?))?\s*(?:-->|\*\/|--}})?\s*$/i);
         if (todoMatch) {
           let title = todoMatch[1].trim();
-          // Remove trailing Blade comment ending if present
-          title = title.replace(/\s*--}}\s*$/, '');
+          // Remove trailing Blade or HTML comment ending if present
+          title = title.replace(/\s*(--}}|-->|\*\/)?\s*$/, '');
           const rawLabels = todoMatch[2] || '';
           const labels = rawLabels
             .split(',')
