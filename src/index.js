@@ -23,13 +23,17 @@ async function run() {
   const token = getInput('github_token');
   const dryRun = getInput('dry_run', 'false') === 'true';
   const shouldCommit = getInput('commit', 'true') === 'true';
+  const prefixesRaw = getInput('prefixes', 'TODO,FIXME,HACK,BUG,NOTE');
+  const prefixes = prefixesRaw.split(',').map(p => p.trim().toUpperCase()).filter(Boolean);
+  const prefixPattern = prefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const todoRegex = new RegExp(`(?:<!--|\\/\\/|#|\\/\\*|\\{\\{--)?\\s*(${prefixPattern}):\\s*(.*?)(?:\\s+Label:\\s*(.+?))?\\s*(?:-->|\\*\\/|--}})?\\s*$`, 'i');
   let summary = '';
   let currentTodos = [];
   try {
     const octokit = github.getOctokit(token);
     const context = github.context;
     const todoLabel = 'todo-md';
-    const files = glob.sync('**/*.{js,ts,php,html,md,css,scss,blade.php}', {
+    const files = glob.sync('**/*.{js,ts,php,html,ejs,md,css,scss,blade.php}', {
       ignore: ['node_modules/**', 'vendor/**', '.git/**', 'scripts/**']
     });
     currentTodos = [];
@@ -37,20 +41,12 @@ async function run() {
       const raw = fs.readFileSync(file, 'utf8');
       const lines = raw.split('\n');
       lines.forEach((line, index) => {
-        // Match TODOs in normal, Blade, and HTML comments
-        // Examples:
-        //   // TODO: ...
-        //   # TODO: ...
-        //   <!-- TODO: ... -->
-        //   {{-- TODO: ... --}}
-        //   /* TODO: ... */
-        //   TODO: ...
-        const todoMatch = line.match(/(?:<!--|\/\/|#|\/\*|\{\{--)?\s*TODO:\s*(.*?)(?:\s+Label:\s*(.+?))?\s*(?:-->|\*\/|--}})?\s*$/i);
+        const todoMatch = line.match(todoRegex);
         if (todoMatch) {
-          let title = todoMatch[1].trim();
-          // Remove trailing Blade or HTML comment ending if present
-          title = title.replace(/\s*(--}}|-->|\*\/)?\s*$/, '');
-          const rawLabels = todoMatch[2] || '';
+          const prefix = todoMatch[1].toUpperCase();
+          let title = todoMatch[2].trim();
+          title = title.replace(/\s*(--}}|--!?>|\*\/)\s*$/, '');
+          const rawLabels = (todoMatch[3] || '').replace(/\s*(--}}|--!?>|\*\/)\s*$/, '');
           const labels = rawLabels
             .split(',')
             .map(l => l.trim().replace(/[.,]$/, ''))
@@ -60,6 +56,7 @@ async function run() {
             sha = getCommitForFileLine(file, index + 1);
           } catch {}
           currentTodos.push({
+            prefix,
             title,
             labels,
             file,
@@ -69,7 +66,7 @@ async function run() {
         }
       });
     }
-    console.log(`✅ Found ${currentTodos.length} TODOs across ${files.length} files`);
+    console.log(`✅ Found ${currentTodos.length} tagged comments (${prefixes.join(', ')}) across ${files.length} files`);
 
     // Build summary
     const grouped = {};
@@ -90,7 +87,7 @@ async function run() {
         const commitNote = t.sha
           ? ` ([commit](https://github.com/${context.repo.owner}/${context.repo.repo}/commit/${t.sha}))`
           : '';
-        summary += `- [ ] ${t.title} (in \`${t.file}\`, line ${t.line})${commitNote}\n`;
+        summary += `- [ ] **[${t.prefix}]** ${t.title} (in \`${t.file}\`, line ${t.line})${commitNote}\n`;
       }
       summary += '\n';
     }
