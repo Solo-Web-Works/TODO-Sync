@@ -1,0 +1,61 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name (e.g. v3)'
+        required: true
+        default: 'v3'
+      release_name:
+        description: 'Release title'
+        required: true
+        default: 'v3'
+      release_notes:
+        description: 'Release notes (markdown)'
+        required: false
+        default: |
+          ## What's Changed
+          * feat: support FIXME, HACK, BUG, NOTE and custom comment prefixes
+          * feat: support TODOs in HTML comments and EJS files
+          * fix: override undici to resolve dependabot vulnerabilities
+          * build(deps): bump various dependencies
+
+          **Full Changelog**: https://github.com/Solo-Web-Works/TODO-Sync/compare/v2...v3
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tag and release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.payload.inputs.tag;
+            const name = context.payload.inputs.release_name;
+            const body = context.payload.inputs.release_notes;
+            const sha = context.sha;
+
+            // Create the tag ref
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${tag}`,
+              sha,
+            });
+
+            // Create the release
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name,
+              body,
+              draft: false,
+              prerelease: false,
+            });
+
+            console.log(`Release created: ${release.data.html_url}`);
