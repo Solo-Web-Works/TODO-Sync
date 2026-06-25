@@ -17,6 +17,10 @@ inputs:
     description: "Whether to auto-commit the TODO summary and updates"
     default: "true"
     required: false
+  prefixes:
+    description: "Comma-separated list of comment prefixes to scan for (e.g. TODO,FIXME,HACK,BUG,NOTE)"
+    default: "TODO,FIXME,HACK,BUG,NOTE"
+    required: false
 runs:
   using: "node20"
   main: "index.js"

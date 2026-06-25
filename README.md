@@ -7,7 +7,8 @@ GitHub
 
 - Automated Issue Creation: Detects TODO comments and creates GitHub Issues accordingly.
 - Issue Updating: Updates existing Issues if corresponding TODO comments are modified.
-- Markdown Summary: Generates a TODO_SUMMARY.md file listing all detected TODO comments with links to their Issues.
+- Markdown Summary: Generates a TODO_SUMMARY.md file listing all detected comments with links to their Issues.
+- Multiple Prefixes: Supports TODO, FIXME, HACK, BUG, NOTE, and any custom prefixes you configure.
 - Customizable Workflow: Configure the action to run on specific events and customize its behavior through inputs.
 
 ## 📦 Installation
@@ -45,36 +46,42 @@ jobs:
 
 ## ⚙️ Inputs
 
-| Name           | Description                                                                            | Required | Default           |
-| -------------- | -------------------------------------------------------------------------------------- | -------- | ----------------- |
-| `github_token` | GitHub token with `repo` and `issues` scopes. Typically `${{ secrets.GITHUB_TOKEN }}`. | Yes      | N/A               |
-| `summary_file` | Path to the markdown file where the TODO summary will be written.                      | No       | `TODO_SUMMARY.md` |
-| `dry_run`      | If set to `true`, the action will simulate the process without making changes.         | No       | `false`           |
-| `commit`       | If set to `true`, the action will commit the updated summary file to the repository.   | No       | `true`            |
+| Name           | Description                                                                            | Required | Default                    |
+| -------------- | -------------------------------------------------------------------------------------- | -------- | -------------------------- |
+| `github_token` | GitHub token with `repo` and `issues` scopes. Typically `${{ secrets.GITHUB_TOKEN }}`. | Yes      | N/A                        |
+| `summary_file` | Path to the markdown file where the TODO summary will be written.                      | No       | `TODO_SUMMARY.md`          |
+| `dry_run`      | If set to `true`, the action will simulate the process without making changes.         | No       | `false`                    |
+| `commit`       | If set to `true`, the action will commit the updated summary file to the repository.   | No       | `true`                     |
+| `prefixes`     | Comma-separated list of comment prefixes to scan for.                                  | No       | `TODO,FIXME,HACK,BUG,NOTE` |
 
 ## 📝 Output
 
 After execution, the action will:
 
-- Scan the codebase for TODO comments.
-- Create or update GitHub Issues corresponding to each TODO.
-- Generate or update the specified markdown summary file with a list of all TODO comments and links to their Issues.
+- Scan the codebase for comments matching the configured prefixes (TODO, FIXME, HACK, BUG, NOTE by default).
+- Create or update GitHub Issues corresponding to each detected comment.
+- Generate or update the specified markdown summary file with a list of all detected comments and links to their Issues.
 
 ## 🛠️ Example
 
-Given the following code snippet:
+Given the following code snippets:
 
 ```javascript
 // TODO: Refactor this function to improve performance
 function processData(data) {
   // ...
 }
+
+// FIXME: This causes a crash when input is null
+function parseInput(input) {
+  // ...
+}
 ```
 
 The action will:
 
-- Create or update a GitHub Issue titled "Refactor this function to improve performance".
-- Add an entry to TODO_SUMMARY.md linking to the Issue and commit.
+- Create or update GitHub Issues titled "Refactor this function to improve performance" and "This causes a crash when input is null".
+- Add entries to TODO_SUMMARY.md (with **[TODO]** and **[FIXME]** prefixes) linking to the Issues and commits.
 
 ## 🧪 Dry Run Mode
 
