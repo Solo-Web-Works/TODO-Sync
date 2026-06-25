@@ -26,7 +26,7 @@ async function run() {
   const prefixesRaw = getInput('prefixes', 'TODO,FIXME,HACK,BUG,NOTE');
   const prefixes = prefixesRaw.split(',').map(p => p.trim().toUpperCase()).filter(Boolean);
   const prefixPattern = prefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  const todoRegex = new RegExp(`(${prefixPattern}):\\s*(.*?)(?:\\s+Label:\\s*(.+))?$`, 'i');
+  const todoRegex = new RegExp(`(?:<!--|\\/\\/|#|\\/\\*|\\{\\{--)?\\s*(${prefixPattern}):\\s*(.*?)(?:\\s+Label:\\s*(.+?))?\\s*(?:-->|\\*\\/|--}})?\\s*$`, 'i');
   let summary = '';
   let currentTodos = [];
   try {
@@ -45,11 +45,8 @@ async function run() {
         if (todoMatch) {
           const prefix = todoMatch[1].toUpperCase();
           let title = todoMatch[2].trim();
-          // Remove trailing Blade comment ending if present
-          title = title.replace(/\s*--}}\s*$/, '');
-          // Remove trailing HTML comment ending if present
-          title = title.replace(/\s*--!?>\s*$/, '');
-          const rawLabels = (todoMatch[3] || '').replace(/\s*--}}\s*$/, '').replace(/\s*--!?>\s*$/, '');
+          title = title.replace(/\s*(--}}|--!?>|\*\/)\s*$/, '');
+          const rawLabels = (todoMatch[3] || '').replace(/\s*(--}}|--!?>|\*\/)\s*$/, '');
           const labels = rawLabels
             .split(',')
             .map(l => l.trim().replace(/[.,]$/, ''))
