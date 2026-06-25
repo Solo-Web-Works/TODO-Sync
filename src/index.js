@@ -29,7 +29,7 @@ async function run() {
     const octokit = github.getOctokit(token);
     const context = github.context;
     const todoLabel = 'todo-md';
-    const files = glob.sync('**/*.{js,ts,php,html,md,css,scss,blade.php}', {
+    const files = glob.sync('**/*.{js,ts,php,html,ejs,md,css,scss,blade.php}', {
       ignore: ['node_modules/**', 'vendor/**', '.git/**', 'scripts/**']
     });
     currentTodos = [];
@@ -42,7 +42,9 @@ async function run() {
           let title = todoMatch[1].trim();
           // Remove trailing Blade comment ending if present
           title = title.replace(/\s*--}}\s*$/, '');
-          const rawLabels = todoMatch[2] || '';
+          // Remove trailing HTML comment ending if present
+          title = title.replace(/\s*--!?>\s*$/, '');
+          const rawLabels = (todoMatch[2] || '').replace(/\s*--}}\s*$/, '').replace(/\s*--!?>\s*$/, '');
           const labels = rawLabels
             .split(',')
             .map(l => l.trim().replace(/[.,]$/, ''))
