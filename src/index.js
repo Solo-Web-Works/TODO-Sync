@@ -23,6 +23,10 @@ async function run() {
   const token = getInput('github_token');
   const dryRun = getInput('dry_run', 'false') === 'true';
   const shouldCommit = getInput('commit', 'true') === 'true';
+  const prefixesRaw = getInput('prefixes', 'TODO,FIXME,HACK,BUG,NOTE');
+  const prefixes = prefixesRaw.split(',').map(p => p.trim().toUpperCase()).filter(Boolean);
+  const prefixPattern = prefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const todoRegex = new RegExp(`(${prefixPattern}):\\s*(.*?)(?:\\s+Label:\\s*(.+))?$`, 'i');
   let summary = '';
   let currentTodos = [];
   try {
@@ -37,12 +41,13 @@ async function run() {
       const raw = fs.readFileSync(file, 'utf8');
       const lines = raw.split('\n');
       lines.forEach((line, index) => {
-        const todoMatch = line.match(/TODO:\s*(.*?)(?:\s+Label:\s*(.+))?$/i);
+        const todoMatch = line.match(todoRegex);
         if (todoMatch) {
-          let title = todoMatch[1].trim();
+          const prefix = todoMatch[1].toUpperCase();
+          let title = todoMatch[2].trim();
           // Remove trailing Blade comment ending if present
           title = title.replace(/\s*--}}\s*$/, '');
-          const rawLabels = todoMatch[2] || '';
+          const rawLabels = todoMatch[3] || '';
           const labels = rawLabels
             .split(',')
             .map(l => l.trim().replace(/[.,]$/, ''))
@@ -52,6 +57,7 @@ async function run() {
             sha = getCommitForFileLine(file, index + 1);
           } catch {}
           currentTodos.push({
+            prefix,
             title,
             labels,
             file,
@@ -61,7 +67,7 @@ async function run() {
         }
       });
     }
-    console.log(`✅ Found ${currentTodos.length} TODOs across ${files.length} files`);
+    console.log(`✅ Found ${currentTodos.length} tagged comments (${prefixes.join(', ')}) across ${files.length} files`);
 
     // Build summary
     const grouped = {};
@@ -82,7 +88,7 @@ async function run() {
         const commitNote = t.sha
           ? ` ([commit](https://github.com/${context.repo.owner}/${context.repo.repo}/commit/${t.sha}))`
           : '';
-        summary += `- [ ] ${t.title} (in \`${t.file}\`, line ${t.line})${commitNote}\n`;
+        summary += `- [ ] **[${t.prefix}]** ${t.title} (in \`${t.file}\`, line ${t.line})${commitNote}\n`;
       }
       summary += '\n';
     }
