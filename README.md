@@ -33,15 +33,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Sync TODOs
-        uses: Solo-Web-Works/TODO-Sync@v2
+        uses: Solo-Web-Works/TODO-Sync@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           summary_file: TODO_SUMMARY.md
           dry_run: false
-          commit: true
+          commit: false
 ```
 
 ## ⚙️ Inputs
