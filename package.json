@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@actions/github": "^7.0.0",
+    "@actions/github": "^9.1.1",
     "glob": "^10.5.0"
   },
   "devDependencies": {
