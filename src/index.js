@@ -1,7 +1,7 @@
 const fs = require('fs');
 const glob = require('glob');
 const core = require('@actions/core');
-const github = import('@actions/github');
+const github = import('@actions/github').then(mod => mod.default || mod);
 const { execSync } = require('child_process');
 
 function getRandomColor() {

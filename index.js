@@ -40325,7 +40325,7 @@ var __webpack_exports__ = {};
 const fs = __nccwpck_require__(9896);
 const glob = __nccwpck_require__(1363);
 const core = __nccwpck_require__(7484);
-const github = __nccwpck_require__.e(/* import() */ 413).then(__nccwpck_require__.bind(__nccwpck_require__, 2413));
+const github = __nccwpck_require__.e(/* import() */ 413).then(__nccwpck_require__.bind(__nccwpck_require__, 2413)).then(mod => mod.default || mod);
 const { execSync } = __nccwpck_require__(5317);
 
 function getRandomColor() {
