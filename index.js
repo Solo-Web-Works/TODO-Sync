@@ -40263,6 +40263,17 @@ exports.PathScurry = process.platform === 'win32' ? PathScurryWin32
 /******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -40314,6 +40325,7 @@ var __webpack_exports__ = {};
 const fs = __nccwpck_require__(9896);
 const glob = __nccwpck_require__(1363);
 const core = __nccwpck_require__(7484);
+const github = __nccwpck_require__.e(/* import() */ 413).then(__nccwpck_require__.bind(__nccwpck_require__, 2413));
 const { execSync } = __nccwpck_require__(5317);
 
 function getRandomColor() {
@@ -40342,7 +40354,7 @@ async function run() {
   let summary = '';
   let currentTodos = [];
   try {
-    const { context, getOctokit } = await __nccwpck_require__.e(/* import() */ 413).then(__nccwpck_require__.bind(__nccwpck_require__, 2413));
+    const { context, getOctokit } = await github;
     const octokit = getOctokit(token);
     const todoLabel = 'todo-md';
     const files = glob.sync('**/*.{js,ts,php,html,ejs,md,css,scss,blade.php}', {

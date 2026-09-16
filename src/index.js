@@ -1,6 +1,7 @@
 const fs = require('fs');
 const glob = require('glob');
 const core = require('@actions/core');
+const github = import('@actions/github');
 const { execSync } = require('child_process');
 
 function getRandomColor() {
@@ -29,7 +30,7 @@ async function run() {
   let summary = '';
   let currentTodos = [];
   try {
-    const { context, getOctokit } = await import('@actions/github');
+    const { context, getOctokit } = await github;
     const octokit = getOctokit(token);
     const todoLabel = 'todo-md';
     const files = glob.sync('**/*.{js,ts,php,html,ejs,md,css,scss,blade.php}', {
