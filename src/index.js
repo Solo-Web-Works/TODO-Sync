@@ -29,9 +29,8 @@ async function run() {
   let summary = '';
   let currentTodos = [];
   try {
-    const github = await import('@actions/github');
-    const octokit = github.getOctokit(token);
-    const context = github.context;
+    const { context, getOctokit } = await import('@actions/github');
+    const octokit = getOctokit(token);
     const todoLabel = 'todo-md';
     const files = glob.sync('**/*.{js,ts,php,html,ejs,md,css,scss,blade.php}', {
       ignore: ['node_modules/**', 'vendor/**', '.git/**', 'scripts/**']
